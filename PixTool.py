@@ -45,7 +45,14 @@ class Pixiv_Picture:
             while 1:
                 try:
                     self.r = requests.get(url = url, headers = self.headers, verify=False)
-                    break
+                    if self.r.status_code == 200:
+                        break
+                    elif self.r.status_code == 404:
+                        print("File not found! Getting the another one...")
+                        break
+                    else:
+                        print("Unknown error! Please check the network. ")
+                        break
                 except:
                     print("Connection failed! Retrying...")
                     time.sleep(5)
