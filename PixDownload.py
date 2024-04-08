@@ -71,11 +71,13 @@ db_bitmask = int(index_mangadex+index_madokami+index_pawoo+index_da+index_portal
 print("dbmask="+str(db_bitmask))
 """
 
+"""
 #encoded print - handle random crap
 def printe(line):
     print(str(line).encode(sys.getdefaultencoding(), 'replace')) #ignore or replace
+"""
 
-
+"""
 def Read_pictures():
     root = os.getcwd()
     WorkPath = root + "\\Predownload"
@@ -120,13 +122,25 @@ class Pixiv_Piclist:
         for pic in self.thislist:
             print(pic["pic_name"]+" = "+pic["illust_id"])
         print("")
+"""
 
 def main():
-    ppl = Pixiv_Piclist()
+    #ppl = Pixiv_Piclist()
     #WebTool.api_key = input("Enter the SauseNAO api-key: ")
-    PP = PixTool.Pixiv_Picture()
-    PP.InputTag()
-    PP.Download()
+    Mode = input("Choose the download mode:\n1: Direct Mode; 2: Mirror Mode.\n")
+    if Mode == "1":
+        PP = PixTool.Pixiv_Picture()
+        PP.InputTag()
+        PP.Download()
+        print("File downloaded successfully. Program exiting...")
+        time.sleep(5)
+    elif Mode == "2":
+        PPM = PixTool.Pixiv_Picture_Mirror()
+        PPM.InputTag()
+        PPM.PicDownload()
+        print("File downloaded successfully. Program exiting...")
+        time.sleep(5)
 
 if __name__ == "__main__":
     main()
+    os.system("pause")

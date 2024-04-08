@@ -3,4 +3,3 @@ MY_HEADERS = {
     'Referer': 'https://www.pixiv.net/'
 }
 api_key = ""
-
