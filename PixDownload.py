@@ -129,13 +129,13 @@ def main():
     #WebTool.api_key = input("Enter the SauseNAO api-key: ")
     Mode = input("Choose the download mode:\n1: Direct Mode; 2: Mirror Mode.\n")
     if Mode == "1":
-        PP = PixTool.Pixiv_Picture()
+        PP = PixTool.Pixiv_Picture("https://www.pixiv.net/artworks")
         PP.InputTag()
         PP.Download()
         print("File downloaded successfully. Program exiting...")
         time.sleep(5)
     elif Mode == "2":
-        PPM = PixTool.Pixiv_Picture_Mirror()
+        PPM = PixTool.Pixiv_Picture_Mirror("https://pixiv.nl/")
         PPM.InputTag()
         PPM.PicDownload()
         print("File downloaded successfully. Program exiting...")
