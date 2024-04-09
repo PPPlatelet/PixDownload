@@ -4,41 +4,21 @@ import requests
 import time
 import re
 import os
+import json
 
 class Pixiv_Picture:
-    def __init__(self, net:str = None):
+    def __init__(self, net:str = None, pid:list = None):
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         self.net = net
-        self.name = []
-        self.pid = []
-        self.url = []
+        self.pid = pid if pid is not None else []
+        self.name = [f"{p}.jpg" for p in self.pid]
+        self.url = [f"{net}{p}"for p in self.pid]
         self.picurls = []
         self.headers = WebTool.MY_HEADERS
 
     def Download(self):
         self.GetUrl()
         self.PicDownload()
-
-    def InputTag(self):
-        print("Enter the 'Q' or 'q' to end the input.")
-        temp = input("Enter the pixiv tag: ")
-        while 1:
-            if temp == 'Q' or temp == 'q':
-                break
-            else:
-                try:
-                    if int(temp) > 0:
-                        self.pid.append(temp)
-                        self.name.append(f"{temp}.jpg")
-                        self.url.append(f"{self.net}{temp}")
-                        temp = input("Input success! Please enter the another pixiv tag: ")
-                        continue
-                    else:
-                        temp = input("Invalid number! Please enter the correct one: ")
-                        continue
-                except ValueError:
-                    temp = input("Unknown error! Please enter the correct one: ")
-                    continue
 
     def GetUrl(self):
         for element,url in enumerate(self.url):
@@ -103,8 +83,8 @@ class Pixiv_Picture:
             print(f"File '{filename}' downloaded successfully. ")
 
 class Pixiv_Picture_Mirror(Pixiv_Picture):
-    def __init__(self, net:str = None):
-        super().__init__(net = net)
+    def __init__(self, net:str = None, pid:list = None):
+        super().__init__(net = net, pid = pid)
 
     def Download(self):
         self.PicDownload()
@@ -142,3 +122,38 @@ class Pixiv_Picture_Mirror(Pixiv_Picture):
                         print("Connection failed! Retrying...")
                         time.sleep(5)
                         continue
+
+"""
+class Pixiv_Piclist:
+    def __init__(self):
+        self.piclist = []
+        self.thislist = []
+
+    def WriteList(self, piclist:list):
+        self.piclist = piclist
+        self.thislist = piclist
+        with open("Download_List.json","w+") as file:
+            json.dump(self.piclist, file)
+            file.close()
+    
+    def readlist(self, num = 0):
+        with open("Download_List.json","r") as file:
+            self.piclist = json.load(file)
+            file.close()
+            this_piclist = self.piclist[num:]
+        return this_piclist
+    
+    def printwholelist(self):
+        self.readlist()
+        print("已存储%d张图片的信息:" % len(self.piclist))
+        for pic in self.piclist:
+            print(pic["pic_name"]+" = "+pic["illust_id"])
+        print("")
+        
+    def printthislist(self, num = 0):
+        self.thislist = self.readlist(num = num)
+        print(f"已下载{num}张图片，剩余{len(self.thislist)}张图片:")
+        for pic in self.thislist:
+            print(pic["pic_name"]+" = "+pic["illust_id"])
+        print("")
+"""
