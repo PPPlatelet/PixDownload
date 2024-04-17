@@ -5,6 +5,9 @@ import time
 import re
 import os
 import json
+import ssl
+from tqdm import tqdm
+import logging
 
 class Pixiv_Picture:
     def __init__(self, net:str = None, pid:list = None):
@@ -14,7 +17,7 @@ class Pixiv_Picture:
         self.name = [f"{p}.jpg" for p in self.pid]
         self.url = [f"{net}{p}"for p in self.pid]
         self.picurls = []
-        self.headers = WebTool.MY_HEADERS
+        self.headers = WebTool.PIXIV_HEADERS
 
     def Download(self):
         self.GetUrl()
@@ -66,7 +69,7 @@ class Pixiv_Picture:
                         time.sleep(5)
                         continue
 
-    def SaveFile(self, pic:requests.Response = None, element:int = None, index:int = None, pic_type:str = None):
+    def SaveFile(self, pic:requests.Response = None, element:int = None, index:int = None, pic_type:str = None, total:int = None):
         if pic is not None and not isinstance(pic, requests.Response):
             raise TypeError("pic must be a requests.Response object")
         if element is not None and not isinstance(element, int):
@@ -76,11 +79,16 @@ class Pixiv_Picture:
         if pic_type is not None and not isinstance(pic_type, str):
             raise TypeError("pic_type must be a string")
         
-        os.makedirs(f"pixiv/{self.pid[element]}",exist_ok=True)
+        targetpath = "pixiv/"
+        if WebTool.DirOK:
+            targetpath += self.pid[element]
+        os.makedirs(targetpath,exist_ok=True)
         filename = f"{self.pid[element]}_p{index}.{pic_type}"
-        with open(f"pixiv/{self.pid[element]}/{filename}", "wb") as file:
-            file.write(pic.content)
-            print(f"File '{filename}' downloaded successfully. ")
+        with open(f"{targetpath}/{filename}", "wb") as file, tqdm(desc = filename, total = total, unit='iB', unit_scale=True, unit_divisor = 1024) as bar:
+            for content in pic.iter_content(chunk_size = 1024):
+                size = file.write(content)
+                bar.update(size)
+        print(f"File '{filename}' downloaded successfully. ")
 
 class Pixiv_Picture_Mirror(Pixiv_Picture):
     def __init__(self, net:str = None, pid:list = None):
@@ -92,36 +100,43 @@ class Pixiv_Picture_Mirror(Pixiv_Picture):
     def PicDownload(self):
         for element,url in enumerate(self.url):
             pic_type = self.name[element][-3:]
+            Flag = False
             if pic_type == "png" or pic_type == "jpg":
                 index = 0
-                while 1:
+                while not Flag:
                     try:
-                        pic = requests.get(url = f"{url}-{index+1}.{pic_type}", headers = self.headers, verify = False)
-                        if pic.status_code == 200:
-                            self.SaveFile(pic = pic, element = element, index = index, pic_type = pic_type)
-                            index += 1
-                        elif pic.status_code == 404:
-                            if index > 0:
-                                print("A set of pictures downloaded successfully.")
-                                break
-                            else:
-                                pic = requests.get(url = f"{url}.{pic_type}", headers=self.headers, verify=False)
+                        pic = requests.get(url = f"{url}-{index+1}.{pic_type}", headers = self.headers, verify = False, stream=True)
+                    except requests.exceptions.SSLError as e:
+                        #print(e)
+                        continue
+                    if pic.status_code == 200:
+                        total = int(pic.headers.get('content-length',0))
+                        self.SaveFile(pic = pic, element = element, index = index, pic_type = pic_type, total = total)
+                        index += 1
+                    elif pic.status_code == 404:
+                        if index > 0:
+                            print("A set of pictures downloaded successfully.")
+                            Flag = True
+                        else:
+                            while not Flag:
+                                try:
+                                    pic = requests.get(url = f"{url}.{pic_type}", headers=self.headers, verify=False)
+                                except requests.exceptions.SSLError as e:
+                                    #print(e)
+                                    continue
                                 if pic.status_code == 200:
-                                    self.SaveFile(pic = pic, element = element, index = index, pic_type = pic_type)
-                                    break
+                                    total = int(pic.headers.get('content-length',0))
+                                    self.SaveFile(pic = pic, element = element, index = index, pic_type = pic_type, total = total)
+                                    Flag = True
                                 elif pic.status_code == 404:
                                     print("File not found! Please input the correct tag! ")
-                                    break
+                                    Flag = True
                                 else:
                                     print("Unknown error! Please check the network. ")
-                                    break
-                        else:
-                            print("Unknown error! Please check the network. ")
-                            break
-                    except:
-                        print("Connection failed! Retrying...")
-                        time.sleep(5)
-                        continue
+                                    Flag = True
+                    else:
+                        print("Unknown error! Please check the network. ")
+                        Flag = True
 
 """
 class Pixiv_Piclist:

@@ -16,6 +16,7 @@ import SauceTool
 #import codecs
 #import unicodedata
 #from collections import OrderedDict
+import logging
 
 DirectURL = "https://www.pixiv.net/artworks"
 MirrorURL = "https://pixiv.nl/"
@@ -41,10 +42,10 @@ def main():
         picname, picpath = Read_pictures()
         SP = SauceTool.SauceNAO_Picture(picname,picpath)
         SP.find_saucenao()
-        SP.print_saucenao_picture()
+        SP.PrintSaucePictures()
         pid = []
         for element,illustid in enumerate(SP.illust_id):
-            if SP.service_name[element] =="pixiv":
+            if SP.result[element]:
                 pid.append(illustid)
         if Mode == "1":
             PP = PixTool.Pixiv_Picture(net = DirectURL, pid = pid)
@@ -56,12 +57,17 @@ def main():
             PPM.Download()
             print("File downloaded successfully. Program exiting...")
             time.sleep(5)
+        if WebTool.DelOK:
+            delfilepath,delfilename = SP.FindDelList()
+            for element,file in enumerate(delfilepath):
+                os.remove(file)
+                print(f"Removed file {delfilename[element]}. ")
     elif num == "2":
         print()
         filename = []
         filepath = []
         pixtag = []
-        temp = input("Input the file name or the pixiv tag.")
+        temp = input("Input the file name or the pixiv tag: ")
         while 1:
             if temp == "Q" or temp == "q":
                 break
@@ -106,7 +112,7 @@ def main():
             time.sleep(5)
     else:
         print("See you next time.")
-        time.sleep(5)
+        time.sleep(5) 
         sys.exit()
 
 if __name__ == "__main__":
