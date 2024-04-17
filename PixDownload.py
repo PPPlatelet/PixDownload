@@ -35,7 +35,7 @@ def Read_pictures():
 
 def main():
     #PPL = PixTool.Pixiv_Piclist()
-    WebTool.api_key = "0da33028dcf5b66e35741e714fbaa3e0ccedc0eb"#input("Enter your SauseNAO api-key: ")
+    WebTool.api_key = input("Enter your SauseNAO api-key: ")
     num = input("Press the download mode: 1.Auto mode 2.Hand ctrl mode 0.Exit\n")
     Mode = input("Choose the download mode:\n1: Direct Mode; 2: Mirror Mode.\n")
     if num == "1":
