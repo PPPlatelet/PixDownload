@@ -1,22 +1,10 @@
 import os
 import sys
-#import io
 import time
-#import json
-#import re
-#import requests
-#import random
-#import ssl
-#import certifi
-#import urllib3
 import WebTool
 import PixTool
 import SauceTool
-#from PIL import Image
-#import codecs
-#import unicodedata
-#from collections import OrderedDict
-import logging
+#import logging
 
 DirectURL = "https://www.pixiv.net/artworks"
 MirrorURL = "https://pixiv.nl/"
@@ -75,9 +63,9 @@ def main():
                 if (temp.endswith(".jpg") or 
                     temp.endswith(".png") or 
                     temp.endswith(".jpeg") or 
-                    temp.endswith(".bmp")) and os.path.exists(f"{os.getcwd()}\\{temp}"):
+                    temp.endswith(".bmp")) and os.path.exists(f"{os.getcwd()}\\Predownload\\{temp}"):
                     filename.append(temp)
-                    filepath.append(f"{os.getcwd()}\\{temp}")
+                    filepath.append(f"{os.getcwd()}\\Predownload\\{temp}")
                     temp = input("Input success! Please enter again: ")
                     continue
                 try:
@@ -94,7 +82,7 @@ def main():
         
         SP = SauceTool.SauceNAO_Picture(filename,filepath)
         SP.find_saucenao()
-        SP.print_saucenao_picture()
+        SP.PrintSaucePictures()
         pid = []
         for element,illustid in enumerate(SP.illust_id):
             if SP.service_name[element] =="pixiv":

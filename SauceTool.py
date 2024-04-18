@@ -7,14 +7,7 @@ import re
 import time
 import WebTool
 import urllib3
-import ssl
-import logging
-#import os
-#import io
-#import unicodedata
-#from pydantic import BaseModel
-#from collections import OrderedDict
-#from PIL import Image
+#import logging
 
 sys.stdout = codecs.getwriter('utf8')(sys.stdout.detach())
 sys.stderr = codecs.getwriter('utf8')(sys.stderr.detach())

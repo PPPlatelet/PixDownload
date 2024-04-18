@@ -4,10 +4,8 @@ import requests
 import time
 import re
 import os
-import json
-import ssl
 from tqdm import tqdm
-import logging
+#import logging
 
 class Pixiv_Picture:
     def __init__(self, net:str = None, pid:list = None):
