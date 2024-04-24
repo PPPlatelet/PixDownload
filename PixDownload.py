@@ -6,7 +6,7 @@ import PixTool
 import SauceTool
 #import logging
 
-DirectURL = "https://www.pixiv.net/artworks"
+DirectURL = "https://www.pixiv.net/artworks/"
 MirrorURL = "https://pixiv.nl/"
 
 def Read_pictures():
