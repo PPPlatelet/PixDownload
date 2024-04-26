@@ -1,9 +1,9 @@
 import os
 import sys
 import time
-import WebTool
-import PixTool
-import SauceTool
+import module.WebTool as WebTool
+import module.PixTool as PixTool
+import module.SauceTool as SauceTool
 #import logging
 
 DirectURL = "https://www.pixiv.net/artworks/"

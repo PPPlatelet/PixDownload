@@ -5,7 +5,7 @@ import json
 import codecs
 import re
 import time
-import WebTool
+import module.WebTool as WebTool
 import urllib3
 #import logging
 
@@ -75,7 +75,7 @@ class SauceNAO_Picture:
 
             while 1:
                 try:
-                    response:requests.Response = requests.post(url=url,files=stream,headers=WebTool.SAUCE_HEADERS,verify=False)
+                    response:requests.Response = requests.post(url=url,files=stream,headers=WebTool.SAUCE_HEADERS,verify=False)#True
                 except requests.exceptions.SSLError as e:
                     #print(e)
                     continue
@@ -143,7 +143,8 @@ class SauceNAO_Picture:
                     result:list = [
                         res
                         for element,res in enumerate(results["results"])
-                        if float(results['results'][element]['header']['similarity']) > float(results['header']['minimum_similarity'])
+                        if float(results['results'][element]['header']['similarity']) 
+                        > float(results['header']['minimum_similarity'])
                     ]
                     result = self.SimilarityQuickSort(result)[::-1]
 
@@ -151,58 +152,55 @@ class SauceNAO_Picture:
                         print("missing...")
                         self.AppendValue()
                         index += 1
-                    else:
-                        print("Possible respond:")
-                        for element,value in enumerate(result):
-                            print(f"{element+1}. similarity: {value["header"]["similarity"]}")
+                        continue
+                    
+                    print("Possible respond:")
+                    for element,value in enumerate(result):
+                        print(f"{element+1}. similarity: {value["header"]["similarity"]}")
 
-                            #get vars to use
-                            service_name = ""
-                            illust_id = ""
-                            member_id = ""
-                            index_id = value["header"]["index_id"]
+                        #get vars to use
+                        service_name = ""
+                        illust_id = ""
+                        member_id = ""
+                        index_id = value["header"]["index_id"]
 
-                            if index_id == 5 or index_id == 6:
-                                #5->pixiv 6->pixiv historical
-                                service_name='pixiv'
-                                member_id = value['data']['member_id']
-                                illust_id = value['data']['pixiv_id']
-                                if str(illust_id) in self.illust_id:
-                                    print("Picture repeat recognition! Pulling the next one...")
-                                    self.AppendValue(service_name,member_id,illust_id,False)
-                                    index += 1
-                                    break
-                                else:
-                                    self.AppendValue(service_name,member_id,illust_id,True)
-                                    index += 1
-                                    break
+                        if index_id in [5, 6]:
+                            #5->pixiv 6->pixiv historical
+                            service_name='pixiv'
+                            member_id = value['data']['member_id']
+                            illust_id = value['data']['pixiv_id']
+                            if str(illust_id) in self.illust_id:
+                                print("Picture repeat recognition! Pulling the next one...")
+                                self.AppendValue(service_name,member_id,illust_id,False)
+                                index += 1
+                                break
                             else:
-                                try:
-                                    if "pixiv" in value['data']['source'] or "pximg" in value['data']['source']:
-                                        illust_id=re.findall(r'\d+$',value['data']['source'])[-1]
-                                        if str(illust_id) in self.illust_id:
-                                            print("Picture repeat recognition! Pulling the next one...")
-                                            self.AppendValue("pixiv","",str(illust_id),False)
-                                            index += 1
-                                            break
-                                        else:
-                                            self.AppendValue("pixiv","",str(illust_id),True)
-                                            index += 1
-                                            break
+                                self.AppendValue(service_name,member_id,illust_id,True)
+                                index += 1
+                                break
+                        else:
+                            try:
+                                if "pixiv" in value['data']['source'] or "pximg" in value['data']['source']:
+                                    illust_id=re.findall(r'\d+$',value['data']['source'])[-1]
+                                    if str(illust_id) in self.illust_id:
+                                        print("Picture repeat recognition! Pulling the next one...")
+                                        self.AppendValue("pixiv","",str(illust_id),False)
+                                        index += 1
+                                        break
                                     else:
-                                        if element == len(result) - 1:
-                                            self.AppendValue()
-                                            index += 1
-                                            break
-                                        else:
-                                            continue
-                                except:
+                                        self.AppendValue("pixiv","",str(illust_id),True)
+                                        index += 1
+                                        break
+                                else:
                                     if element == len(result) - 1:
                                         self.AppendValue()
                                         index += 1
                                         break
-                                    else:
-                                        continue
+                            except:
+                                if element == len(result) - 1:
+                                    self.AppendValue()
+                                    index += 1
+                                    break
                             
                 else:
                     print("no result... ;_;")
