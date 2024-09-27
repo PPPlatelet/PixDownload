@@ -3,6 +3,7 @@ pixiv/
 Predownload/
 !pixiv/*.md
 !Predownload/*.md
+.idea/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
